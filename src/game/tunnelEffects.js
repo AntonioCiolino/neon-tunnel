@@ -11,8 +11,17 @@ export function spawnObstacle(game) {
   );
   const archetype = eligibleTypes[Math.floor(game.random() * eligibleTypes.length)];
   const center = getTunnelCenter(game.distance + SPAWN_DEPTH);
+  if (game.swarmDistance !== game.distance) {
+    const swarmAngle = game.random() * Math.PI * 2;
+    const swarmOffset = Math.sqrt(game.random()) * (TUNNEL_RADIUS - 1.6);
+    game.swarmCenter = {
+      x: center.x + Math.cos(swarmAngle) * swarmOffset,
+      y: center.y + Math.sin(swarmAngle) * swarmOffset,
+    };
+    game.swarmDistance = game.distance;
+  }
   const angle = game.random() * Math.PI * 2;
-  const offset = Math.sqrt(game.random()) * (TUNNEL_RADIUS - 1.6);
+  const offset = Math.sqrt(game.random()) * 0.8;
   game.obstacles.push({
     type: archetype.type,
     skill: archetype.skill,
@@ -20,8 +29,8 @@ export function spawnObstacle(game) {
     speed: archetype.speed,
     canSplit: Boolean(archetype.canSplit),
     id: game.nextId++,
-    x: center.x + Math.cos(angle) * offset,
-    y: center.y + Math.sin(angle) * offset,
+    x: game.swarmCenter.x + Math.cos(angle) * offset,
+    y: game.swarmCenter.y + Math.sin(angle) * offset,
     z: SPAWN_DEPTH,
     radius: (1.2 + game.random() * 0.4) * archetype.size,
     driftX: (game.random() - 0.5) * 1.8,

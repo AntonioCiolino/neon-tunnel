@@ -14,9 +14,11 @@ export function updateObstacleMotion(obstacle, player, level, delta) {
   return {
     ...obstacle,
     x: (distance > 0 ? obstacle.x + (dx / distance) * steeringStep : obstacle.x) +
-      (obstacle.driftX || 0) * frameDelta,
+      (obstacle.driftX || 0) * frameDelta +
+      Math.sin((obstacle.rotation || 0) * 31 + obstacle.id) * 2.5 * frameDelta,
     y: (distance > 0 ? obstacle.y + (dy / distance) * steeringStep : obstacle.y) +
-      (obstacle.driftY || 0) * frameDelta,
+      (obstacle.driftY || 0) * frameDelta +
+      Math.cos((obstacle.rotation || 0) * 37 + obstacle.id) * 2.5 * frameDelta,
     z: distance > 0 ? obstacle.z + (dz / distance) * steeringStep : obstacle.z,
   };
 }
