@@ -7,9 +7,11 @@ export function emitGameEvent(game, type) {
 
 export function spawnObstacle(game) {
   const eligibleTypes = enemyTypes.filter(
-    ({ skill }) => skill <= getEnemyComplexityLimit(game.level),
+    ({ skill, type }) => skill <= getEnemyComplexityLimit(game.level) &&
+      (type !== "starPod" || game.starPodSpawnedLevel !== game.level),
   );
   const archetype = eligibleTypes[Math.floor(game.random() * eligibleTypes.length)];
+  if (archetype.type === "starPod") game.starPodSpawnedLevel = game.level;
   const center = getTunnelCenter(game.distance + SPAWN_DEPTH);
   if (game.swarmDistance !== game.distance) {
     const swarmAngle = game.random() * Math.PI * 2;
