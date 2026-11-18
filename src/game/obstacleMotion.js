@@ -1,3 +1,5 @@
+const DEPTH_SPEED = 18;
+
 export function updateObstacleMotion(obstacle, center, level, delta, collisionDepth) {
   if (!Number.isFinite(delta) || delta <= 0) return obstacle;
 
@@ -12,6 +14,6 @@ export function updateObstacleMotion(obstacle, center, level, delta, collisionDe
     ...obstacle,
     x: distance > 0 ? obstacle.x + (dx / distance) * steeringStep : obstacle.x,
     y: distance > 0 ? obstacle.y + (dy / distance) * steeringStep : obstacle.y,
-    z: Math.max(collisionDepth, obstacle.z - step),
+    z: Math.max(collisionDepth, obstacle.z - DEPTH_SPEED * Math.min(delta, 0.1)),
   };
 }

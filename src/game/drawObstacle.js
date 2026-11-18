@@ -27,11 +27,12 @@ export function drawObstacle(ctx, obstacle, distance, width, height) {
   );
   const warning = obstacle.z <= WARNING_DEPTH &&
     isObstacleCollision(obstacle, getTunnelCenter(distance));
+  const perspective = projectTunnelPoint(obstacle, distance, width, height);
   const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 140);
 
   ctx.save();
   ctx.strokeStyle = warning ? `rgba(255, ${Math.round(35 + 35 * pulse)}, ${Math.round(35 + 35 * pulse)}, 1)` : "#b8ff45";
-  ctx.lineWidth = warning ? 2 + pulse : 2;
+  ctx.lineWidth = warning ? 2 + pulse : Math.max(1, Math.min(8, perspective.scale / 10));
   if (warning) {
     ctx.shadowColor = "#ff2020";
     ctx.shadowBlur = 8 + pulse * 18;
