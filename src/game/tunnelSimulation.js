@@ -116,7 +116,7 @@ export function shootTunnelObstacle(game, x, y, width, height) {
 
   if (!target) return null;
   game.obstacles = game.obstacles.filter ( (obstacle) => obstacle !== target);
-  game.score += 100 + target.z;
+  game.score += Math.round((100 + target.z) / 10) * 10;
   explode(game, target);
   return target;
 }
