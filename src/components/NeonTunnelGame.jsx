@@ -3,10 +3,23 @@ import TunnelCanvas from "./TunnelCanvas.jsx";
 import ProgressionHud from "./ProgressionHud.jsx";
 import LevelAdvanceToast from "./LevelAdvanceToast.jsx";
 import DamageFlash from "./DamageFlash.jsx";
+import GameControls from "./GameControls.jsx";
 import { useTunnelGame } from "../hooks/useTunnelGame.js";
 
 function GameSession({ onRestart }) {
-  const { canvasRef, shoot: onShoot, status, score, distance, hits, round, level } = useTunnelGame();
+  const {
+    canvasRef,
+    shoot: onShoot,
+    status,
+    score,
+    distance,
+    hits,
+    round,
+    level,
+    paused,
+    pause,
+    resume,
+  } = useTunnelGame();
   const hud = { status, score, distance, hits, round, level };
   const gameOver = hud.status !== "playing";
 
@@ -19,6 +32,10 @@ function GameSession({ onRestart }) {
         <div className="flex gap-5 font-mono text-sm sm:gap-8 sm:text-base">
           <span> SCORE <strong className="text-white">{hud.score}</strong></span>
           <span> HITS <strong className="text-rose-400">{hud.hits}/3</strong></span>
+          <GameControls
+            paused={paused}
+            onToggle={() => (paused ? resume() : pause())}
+          />
         </div>
       </header>
 
