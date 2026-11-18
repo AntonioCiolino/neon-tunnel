@@ -13,6 +13,7 @@ export function useTunnelGame(onEvent) {
   const elementRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
   const [paused, setPaused] = useState(false);
+  const [enemyHitCount, setEnemyHitCount] = useState(0);
   const pausedRef = useRef(false);
   const [hud, setHud] = useState(() => ({
     status: gameRef.current.status,
@@ -32,7 +33,12 @@ export function useTunnelGame(onEvent) {
 
   const flushEvents = useCallback(() => {
     const events = gameRef.current.events.splice(0);
-    events.forEach(onEvent);
+    events.forEach((event) => {
+      if (event.type === "enemyHit") {
+        setEnemyHitCount((count) => count + 1);
+      }
+      onEvent(event);
+    });
   }, [onEvent]);
 
   const syncHud = useCallback(() => {
@@ -130,5 +136,5 @@ export function useTunnelGame(onEvent) {
     };
   }, [canvas, flushEvents, syncHud]);
 
-  return { canvasRef, ...hud, paused, pause, resume, shoot, restart };
+  return { canvasRef, ...hud, paused, enemyHitCount, pause, resume, shoot, restart };
 }

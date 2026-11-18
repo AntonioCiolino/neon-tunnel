@@ -16,6 +16,7 @@ function GameSession({ onRestart, onEvent }) {
     score,
     distance,
     hits,
+    enemyHitCount,
     ammo,
     round,
     level,
@@ -58,7 +59,7 @@ function GameSession({ onRestart, onEvent }) {
 
       <ProgressionHud round={hud.round} level={hud.level} distance={hud.distance} />
       <LevelAdvanceToast level={hud.level} />
-      <DamageFlash hits={hud.hits} />
+      <DamageFlash hits={hud.hits} enemyHits={enemyHitCount} />
       <TunnelCanvas canvasRef={canvasRef} onShoot={handleShoot} />
 
       {gameOver && (
