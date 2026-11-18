@@ -19,6 +19,7 @@ export function useTunnelGame(onEvent) {
     score: gameRef.current.score,
     distance: Math.floor(gameRef.current.distance),
     hits: gameRef.current.hits,
+    ammo: gameRef.current.ammo,
     round: gameRef.current.round,
     level: gameRef.current.level,
   }));
@@ -35,12 +36,12 @@ export function useTunnelGame(onEvent) {
   }, [onEvent]);
 
   const syncHud = useCallback(() => {
-    const { status, score, hits, round, level } = gameRef.current;
+    const { status, score, hits, ammo, round, level } = gameRef.current;
     const distance = Math.floor(gameRef.current.distance);
     const previous = hudRef.current;
     if (status !== previous.status || score !== previous.score || distance !== previous.distance || hits !== previous.hits ||
-        round !== previous.round || level !== previous.level) {
-      const next = { status, score, distance, hits, round, level };
+        ammo !== previous.ammo || round !== previous.round || level !== previous.level) {
+      const next = { status, score, distance, hits, ammo, round, level };
       hudRef.current = next;
       setHud(next);
     }
