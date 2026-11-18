@@ -16,6 +16,7 @@ import { advanceProjectiles, createProjectile, MAX_AMMO } from "./projectiles";
 import { advanceEnemyProjectiles, fireEnemyProjectile } from "./enemyProjectiles";
 import { getEnemyFireInterval, selectEnemyShooter } from "./enemyShooting";
 import { applyHealthDamage, getImpactDamage, MAX_HEALTH } from "./healthSystem";
+import { collectReward, spawnReward } from "./rewardSystem";
 
 export {
   COLLISION_DEPTH,
@@ -66,7 +67,10 @@ export function updateTunnelSimulation(game, delta) {
   game.round = Math.floor(game.distance / ROUND_DISTANCE) + 1;
   const previousLevel = game.level;
   game.level = Math.floor((game.round - 1) / ROUNDS_PER_LEVEL) + 1;
-  if (game.level > previousLevel) emitGameEvent(game, "levelUp");
+  if (game.level > previousLevel) {
+    emitGameEvent(game, "levelUp");
+    if (game.level % 3 === 0) spawnReward(game);
+  }
   game.spawnTimer += dt;
 
   for (const obstacle of game.obstacles) {
@@ -84,6 +88,10 @@ export function updateTunnelSimulation(game, delta) {
 
   const projectileHits = advanceProjectiles(game, dt);
   for (const target of projectileHits) {
+    if (target.type === "reward") {
+      collectReward(game);
+      continue;
+    }
     game.score += Math.round((100 + target.z) / 10) * 10;
     splitObstacle(game, target);
     explode(game, target);
@@ -92,7 +100,8 @@ export function updateTunnelSimulation(game, delta) {
     (obstacle) => !projectileHits.includes(obstacle),
   );
   const impacts = game.obstacles.filter(
-    (obstacle) => distance3D(obstacle, game.player) <= obstacle.radius + COLLISION_DEPTH,
+    (obstacle) => obstacle.type !== "reward" &&
+      distance3D(obstacle, game.player) <= obstacle.radius + COLLISION_DEPTH,
   );
   game.obstacles = game.obstacles.filter(
     (obstacle) => obstacle.z > game.player.z + COLLISION_DEPTH &&
