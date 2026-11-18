@@ -95,8 +95,12 @@ export function updateTunnelSimulation(game, delta) {
   }
 
   const missed = game.obstacles.filter((obstacle) => obstacle.z <= COLLISION_DEPTH);
+  const player = getTunnelCenter(game.distance);
+  const impacts = missed.filter((obstacle) =>
+    Math.hypot(obstacle.x - player.x, obstacle.y - player.y) <= obstacle.radius
+  );
   game.obstacles = game.obstacles.filter((obstacle) => obstacle.z > COLLISION_DEPTH);
-  game.hits = Math.min(MAX_HITS, game.hits + missed.length);
+  game.hits = Math.min(MAX_HITS, game.hits + impacts.length);
 
   for (const fragment of game.fragments) {
     fragment.x += fragment.vx * dt;
