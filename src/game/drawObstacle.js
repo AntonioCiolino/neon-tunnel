@@ -25,9 +25,8 @@ export function drawObstacle(ctx, obstacle, distance, width, height) {
       z: obstacle.z + z * obstacleRadius * 0.55,
     }, distance, width, height),
   );
-  const impactDistance = distance + Math.max(0, obstacle.z - COLLISION_DEPTH);
   const warning = obstacle.z <= WARNING_DEPTH &&
-    isObstacleCollision(obstacle, getTunnelCenter(impactDistance));
+    isObstacleCollision(obstacle, getTunnelCenter(distance));
   const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 140);
 
   ctx.save();
