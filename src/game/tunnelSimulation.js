@@ -12,6 +12,7 @@ import {
 import { distance3D, projectWorldPoint } from "./world3d";
 import { updateObstacleMotion } from "./obstacleMotion";
 import { emitGameEvent, explode, spawnObstacle, splitObstacle } from "./tunnelEffects";
+import { advanceProjectiles, createProjectile, MAX_AMMO } from "./projectiles";
 
 export {
   COLLISION_DEPTH,
@@ -35,6 +36,8 @@ export function createTunnelSimulation(random = Math.random) {
     score: 0,
     hits: 0,
     obstacles: [],
+    projectiles: [],
+    ammo: MAX_AMMO,
     fragments: [],
     events: [],
     spawnTimer: 0,
@@ -72,6 +75,14 @@ export function updateTunnelSimulation(game, delta) {
     obstacle.rotation += dt;
   }
 
+  for (const target of advanceProjectiles(game, dt)) {
+    game.score += Math.round((100 + target.z) / 10) * 10;
+    splitObstacle(game, target);
+    explode(game, target);
+  }
+  const projectileHits = new Set(
+    game.events.length ? [] : [],
+  );
   const impacts = game.obstacles.filter(
     (obstacle) => distance3D(obstacle, game.player) <= obstacle.radius + COLLISION_DEPTH,
   );
