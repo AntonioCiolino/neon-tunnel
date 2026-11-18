@@ -12,6 +12,8 @@ export function useTunnelGame() {
 
   const elementRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
   const [hud, setHud] = useState(() => ({
     status: gameRef.current.status,
     score: gameRef.current.score,
@@ -39,8 +41,20 @@ export function useTunnelGame() {
     }
   }, []);
 
+  const pause = useCallback(() => {
+    pausedRef.current = true;
+    setPaused(true);
+  }, []);
+
+  const resume = useCallback(() => {
+    pausedRef.current = false;
+    setPaused(false);
+  }, []);
+
   const restart = useCallback(() => {
     gameRef.current = createTunnelSimulation();
+    pausedRef.current = false;
+    setPaused(false);
     syncHud();
   }, [syncHud]);
 
@@ -86,7 +100,7 @@ export function useTunnelGame() {
     };
 
     const animate = (time) => {
-      if (previousTime !== undefined) {
+      if (previousTime !== undefined && !pausedRef.current) {
         updateTunnelSimulation(gameRef.current, (time - previousTime) / 1000);
         syncHud();
       }
@@ -108,5 +122,5 @@ export function useTunnelGame() {
     };
   }, [canvas, syncHud]);
 
-  return { canvasRef, ...hud, shoot, restart };
+  return { canvasRef, ...hud, paused, pause, resume, shoot, restart };
 }
