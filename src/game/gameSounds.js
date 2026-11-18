@@ -35,7 +35,7 @@ export function playGameSound(audioContext, event) {
   if (!eventType) return;
 
   const normalizedType = eventType.replace(/[-_\s]/g, "");
-  const volume = normalizedType === "shoot" || normalizedType === "shot" ? 0.042 : 0.12;
+  const volume = normalizedType === "shoot" || normalizedType === "shot" ? 0.021 : 0.06;
   const pattern = SOUND_PATTERNS[eventType] ||
     SOUND_PATTERNS[EVENT_ALIASES[normalizedType]] ||
     [[420, 0.1, 0, "sine"]];
