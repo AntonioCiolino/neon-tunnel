@@ -4,8 +4,8 @@ import ProgressionHud from "./ProgressionHud.jsx";
 import { useTunnelGame } from "../hooks/useTunnelGame.js";
 
 function GameSession({ onRestart }) {
-  const { canvasRef, shoot: onShoot, status, score, hits, round, level } = useTunnelGame();
-  const hud = { status, score, hits, round, level };
+  const { canvasRef, shoot: onShoot, status, score, distance, hits, round, level } = useTunnelGame();
+  const hud = { status, score, distance, hits, round, level };
   const gameOver = hud.status !== "playing";
 
   return (
@@ -20,7 +20,7 @@ function GameSession({ onRestart }) {
         </div>
       </header>
 
-      <ProgressionHud round={hud.round} level={hud.level} />
+      <ProgressionHud round={hud.round} level={hud.level} distance={hud.distance} />
       <TunnelCanvas canvasRef={canvasRef} onShoot={onShoot} />
 
       {gameOver && (
