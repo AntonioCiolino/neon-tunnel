@@ -13,6 +13,7 @@ import { distance3D, projectWorldPoint } from "./world3d";
 import { updateObstacleMotion } from "./obstacleMotion";
 import { emitGameEvent, explode, spawnObstacle, splitObstacle } from "./tunnelEffects";
 import { advanceProjectiles, createProjectile, MAX_AMMO } from "./projectiles";
+import { advanceEnemyProjectiles, fireEnemyProjectile } from "./enemyProjectiles";
 
 export {
   COLLISION_DEPTH,
@@ -37,6 +38,8 @@ export function createTunnelSimulation(random = Math.random) {
     hits: 0,
     obstacles: [],
     projectiles: [],
+    enemyProjectiles: [],
+    enemyFireTimer: 0,
     ammo: MAX_AMMO,
     fragments: [],
     events: [],
@@ -102,6 +105,20 @@ export function updateTunnelSimulation(game, delta) {
     fragment.life -= dt;
   }
   game.fragments = game.fragments.filter((fragment) => fragment.life > 0 && fragment.z > 0);
+
+  game.enemyFireTimer += dt;
+  if (game.enemyFireTimer >= 1.2) {
+    game.enemyFireTimer -= 1.2;
+    if (game.obstacles.length > 0) {
+      const shooter = game.obstacles[
+        Math.floor(game.random() * game.obstacles.length)
+      ];
+      fireEnemyProjectile(game, shooter);
+    }
+  }
+  const enemyHits = advanceEnemyProjectiles(game, dt);
+  game.score -= enemyHits * 10;
+  for (let i = 0; i < enemyHits; i += 1) emitGameEvent(game, "enemyHit");
 
   if (game.hits >= MAX_HITS) {
     game.status = "gameOver";
