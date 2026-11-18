@@ -49,9 +49,25 @@ function distanceToSegment(point, start, end) {
   );
 }
 
+function distanceBetweenProjectiles(projectile, enemyProjectile, delta) {
+  const dx = enemyProjectile.x - projectile.x;
+  const dy = enemyProjectile.y - projectile.y;
+  const dz = enemyProjectile.z - projectile.z;
+  const dvx = enemyProjectile.vx - projectile.vx;
+  const dvy = enemyProjectile.vy - projectile.vy;
+  const dvz = enemyProjectile.vz - projectile.vz;
+  const relativeSpeedSquared = dvx ** 2 + dvy ** 2 + dvz ** 2;
+  const time = relativeSpeedSquared > 0
+    ? Math.max(0, Math.min(delta, -(dx * dvx + dy * dvy + dz * dvz) / relativeSpeedSquared))
+    : 0;
+
+  return Math.hypot(dx + dvx * time, dy + dvy * time, dz + dvz * time);
+}
+
 export function advanceProjectiles(game, delta) {
   const hits = [];
   const hitObstacles = new Set();
+  const hitEnemyProjectiles = new Set();
   const remaining = [];
 
   for (const projectile of game.projectiles) {
@@ -60,6 +76,18 @@ export function advanceProjectiles(game, delta) {
       y: projectile.y + projectile.vy * delta,
       z: projectile.z + projectile.vz * delta,
     };
+    const enemyTarget = game.enemyProjectiles.find((enemyProjectile) =>
+      !hitEnemyProjectiles.has(enemyProjectile) &&
+      distanceBetweenProjectiles(projectile, enemyProjectile, delta) <=
+        enemyProjectile.radius + projectile.radius,
+    );
+
+    if (enemyTarget) {
+      hitEnemyProjectiles.add(enemyTarget);
+      game.ammo = Math.min(MAX_AMMO, game.ammo + 1);
+      continue;
+    }
+
     const target = game.obstacles.find((obstacle) =>
       !hitObstacles.has(obstacle) &&
       distanceToSegment(obstacle, projectile, next) <=
@@ -78,5 +106,8 @@ export function advanceProjectiles(game, delta) {
   }
 
   game.projectiles = remaining;
+  game.enemyProjectiles = game.enemyProjectiles.filter(
+    (projectile) => !hitEnemyProjectiles.has(projectile),
+  );
   return hits;
 }
