@@ -38,6 +38,7 @@ export function createTunnelSimulation(random = Math.random) {
     round: 1,
     level: 1,
     score: 0,
+    nextHealthMilestone: 100000,
     health: MAX_HEALTH,
     maxHealth: MAX_HEALTH,
     hits: 0,
@@ -93,6 +94,7 @@ export function updateTunnelSimulation(game, delta) {
       continue;
     }
     game.score += Math.round((100 + target.z) / 10) * 10;
+    while (game.score >= game.nextHealthMilestone) { game.health = Math.min(game.maxHealth, game.health + 100); game.nextHealthMilestone += 100000; }
     splitObstacle(game, target);
     explode(game, target);
   }
