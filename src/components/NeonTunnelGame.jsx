@@ -1,6 +1,7 @@
 import { useState } from "react";
 import TunnelCanvas from "./TunnelCanvas.jsx";
 import ProgressionHud from "./ProgressionHud.jsx";
+import LevelAdvanceToast from "./LevelAdvanceToast.jsx";
 import { useTunnelGame } from "../hooks/useTunnelGame.js";
 
 function GameSession({ onRestart }) {
@@ -21,6 +22,7 @@ function GameSession({ onRestart }) {
       </header>
 
       <ProgressionHud round={hud.round} level={hud.level} distance={hud.distance} />
+      <LevelAdvanceToast level={hud.level} />
       <TunnelCanvas canvasRef={canvasRef} onShoot={onShoot} />
 
       {gameOver && (
