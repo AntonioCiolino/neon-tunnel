@@ -11,7 +11,7 @@ import {
 } from "./tunnelGeometry";
 import { distance3D, projectWorldPoint } from "./world3d";
 import { updateObstacleMotion } from "./obstacleMotion";
-import { explode, spawnObstacle, splitObstacle } from "./tunnelEffects";
+import { emitGameEvent, explode, spawnObstacle, splitObstacle } from "./tunnelEffects";
 
 export {
   COLLISION_DEPTH,
@@ -36,6 +36,7 @@ export function createTunnelSimulation(random = Math.random) {
     hits: 0,
     obstacles: [],
     fragments: [],
+    events: [],
     spawnTimer: 0,
     nextId: 0,
     random,
@@ -53,7 +54,9 @@ export function updateTunnelSimulation(game, delta) {
   game.distance += travel;
   game.player = { ...getTunnelCenter(game.distance), z: game.distance };
   game.round = Math.floor(game.distance / ROUND_DISTANCE) + 1;
+  const previousLevel = game.level;
   game.level = Math.floor((game.round - 1) / ROUNDS_PER_LEVEL) + 1;
+  if (game.level > previousLevel) emitGameEvent(game, "levelUp");
   game.spawnTimer += dt;
 
   for (const obstacle of game.obstacles) {
@@ -77,6 +80,7 @@ export function updateTunnelSimulation(game, delta) {
       !impacts.includes(obstacle),
   );
   game.hits = Math.min(MAX_HITS, game.hits + impacts.length);
+  impacts.forEach(() => emitGameEvent(game, "hit"));
 
   for (const fragment of game.fragments) {
     fragment.x += fragment.vx * dt;
@@ -89,6 +93,7 @@ export function updateTunnelSimulation(game, delta) {
 
   if (game.hits >= MAX_HITS) {
     game.status = "gameOver";
+    emitGameEvent(game, "gameOver");
     return;
   }
 
@@ -106,6 +111,7 @@ export function updateTunnelSimulation(game, delta) {
 export function shootTunnelObstacle(game, x, y, width, height) {
   if (game.status !== "playing" || !Number.isFinite(x) || !Number.isFinite(y)) return null;
 
+  emitGameEvent(game, "shoot");
   let target = null;
   for (const obstacle of game.obstacles) {
     const projected = projectWorldPoint(obstacle, game.player, width, height);

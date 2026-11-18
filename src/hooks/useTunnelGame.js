@@ -6,7 +6,7 @@ import {
   updateTunnelSimulation,
 } from "../game/tunnelSimulation";
 
-export function useTunnelGame() {
+export function useTunnelGame(onEvent) {
   const gameRef = useRef(null);
   if (!gameRef.current) gameRef.current = createTunnelSimulation();
 
@@ -28,6 +28,11 @@ export function useTunnelGame() {
     elementRef.current = element;
     setCanvas(element);
   }, []);
+
+  const flushEvents = useCallback(() => {
+    const events = gameRef.current.events.splice(0);
+    events.forEach(onEvent);
+  }, [onEvent]);
 
   const syncHud = useCallback(() => {
     const { status, score, hits, round, level } = gameRef.current;
@@ -71,9 +76,10 @@ export function useTunnelGame() {
       rect.width,
       rect.height,
     );
+    flushEvents();
     syncHud();
     return result;
-  }, [syncHud]);
+  }, [flushEvents, syncHud]);
 
   useEffect(() => {
     if (!canvas) return undefined;
@@ -102,6 +108,7 @@ export function useTunnelGame() {
     const animate = (time) => {
       if (previousTime !== undefined && !pausedRef.current) {
         updateTunnelSimulation(gameRef.current, (time - previousTime) / 1000);
+        flushEvents();
         syncHud();
       }
       previousTime = time;
@@ -120,7 +127,7 @@ export function useTunnelGame() {
       observer?.disconnect();
       window.removeEventListener("resize", resize);
     };
-  }, [canvas, syncHud]);
+  }, [canvas, flushEvents, syncHud]);
 
   return { canvasRef, ...hud, paused, pause, resume, shoot, restart };
 }

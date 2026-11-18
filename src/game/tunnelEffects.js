@@ -1,6 +1,10 @@
 import { SPAWN_DEPTH, TUNNEL_RADIUS, getTunnelCenter } from "./tunnelGeometry";
 import { enemyTypes, getEnemyComplexityLimit } from "./enemyTypes";
 
+export function emitGameEvent(game, type) {
+  game.events.push({ type });
+}
+
 export function spawnObstacle(game) {
   const eligibleTypes = enemyTypes.filter(
     ({ skill }) => skill <= getEnemyComplexityLimit(game.level),
@@ -29,6 +33,7 @@ export function spawnObstacle(game) {
 export function splitObstacle(game, obstacle) {
   if (!obstacle.canSplit) return false;
 
+  emitGameEvent(game, "split");
   const offset = obstacle.radius * 0.75;
   for (const direction of [-1, 1]) {
     game.obstacles.push({
@@ -45,6 +50,7 @@ export function splitObstacle(game, obstacle) {
 }
 
 export function explode(game, obstacle) {
+  emitGameEvent(game, "explode");
   for (let i = 0; i < 12; i += 1) {
     const angle = game.random() * Math.PI * 2;
     const speed = 1 + game.random() * 5;

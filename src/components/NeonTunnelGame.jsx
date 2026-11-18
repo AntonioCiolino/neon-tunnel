@@ -5,9 +5,9 @@ import LevelAdvanceToast from "./LevelAdvanceToast.jsx";
 import DamageFlash from "./DamageFlash.jsx";
 import GameControls from "./GameControls.jsx";
 import { useTunnelGame } from "../hooks/useTunnelGame.js";
-import useGameSounds from "../hooks/useGameSounds.js";
+import useGameEventSounds from "../hooks/useGameEventSounds.js";
 
-function GameSession({ onRestart, sounds }) {
+function GameSession({ onRestart, onEvent }) {
   const {
     canvasRef,
     shoot: onShoot,
@@ -20,29 +20,19 @@ function GameSession({ onRestart, sounds }) {
     paused,
     pause,
     resume,
-  } = useTunnelGame();
+  } = useTunnelGame(onEvent);
   const hud = { status, score, distance, hits, round, level };
   const gameOver = hud.status !== "playing";
-  const previousState = useRef({ hits, level, status });
-
-  useEffect(() => {
-    const previous = previousState.current;
-    if (hits > previous.hits) sounds.playHit();
-    if (level > previous.level) sounds.playLevelUp();
-    if (previous.status === "playing" && status !== "playing") sounds.playGameOver();
-    previousState.current = { hits, level, status };
-  }, [hits, level, status, sounds]);
 
   const handleShoot = (x, y) => {
-    sounds.playShoot();
     onShoot(x, y);
   };
   const handleTogglePause = () => {
     if (paused) {
-      sounds.playResume();
+      onEvent({ type: "resume" });
       resume();
     } else {
-      sounds.playPause();
+      onEvent({ type: "pause" });
       pause();
     }
   };
@@ -88,12 +78,13 @@ function GameSession({ onRestart, sounds }) {
 }
 
 export default function NeonTunnelGame() {
-  const sounds = useGameSounds();
+  const { unlockAudio, playEvent } = useGameEventSounds();
+  const onEvent = (event) => playEvent(event);
   const [started, setStarted] = useState(false);
   const [run, setRun] = useState(0);
 
   if (started) {
-    return <GameSession key={run} sounds={sounds} onRestart={() => setRun((value) => value + 1)} />;
+    return <GameSession key={run} onEvent={onEvent} onRestart={() => setRun((value) => value + 1)} />;
   }
 
   return (
@@ -108,7 +99,8 @@ export default function NeonTunnelGame() {
         </p>
         <button
           onClick={() => {
-            sounds.playStart();
+            unlockAudio();
+            onEvent({ type: "start" });
             setStarted(true);
           }}
           className="border border-emerald-400 bg-emerald-400 px-8 py-4 font-bold uppercase tracking-[0.2em] text-black hover:bg-emerald-300"
