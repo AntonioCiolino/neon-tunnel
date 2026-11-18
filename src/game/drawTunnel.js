@@ -2,6 +2,7 @@ import { getTunnelCenter } from "./tunnelGeometry";
 import { createCamera, projectWorldPoint } from "./world3d";
 import { drawObstacle } from "./drawObstacle";
 import { drawProjectiles } from "./drawProjectiles";
+import { drawEnemyProjectiles } from "./drawEnemyProjectiles";
 
 export function drawTunnel(ctx, game, width, height) {
   if (!ctx || !game || width <= 0 || height <= 0) return;
@@ -76,6 +77,7 @@ export function drawTunnel(ctx, game, width, height) {
   }
 
   drawProjectiles(ctx, game.projectiles, camera, width, height);
+  drawEnemyProjectiles(ctx, game.enemyProjectiles, camera, width, height);
 
   for (const fragment of game.fragments) {
     const point = projectWorldPoint(fragment, camera, width, height);
