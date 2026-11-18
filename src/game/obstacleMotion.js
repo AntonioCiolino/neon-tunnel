@@ -5,12 +5,36 @@ export function updateObstacleMotion(obstacle, player, level, delta) {
 
   const frameDelta = Math.min(delta, 0.1);
   if (obstacle.type === "starGnat") {
-    const orbitAngle = obstacle.rotation / 5 + obstacle.id * 2.399963229728653;
+    let approaching = obstacle.gnatApproaching ?? true;
+    let modeTimer = (obstacle.gnatModeTimer ?? 0) - frameDelta;
+    if (modeTimer <= 0) {
+      approaching = !approaching;
+      modeTimer = approaching
+        ? obstacle.gnatApproachDuration ?? 0.65
+        : obstacle.gnatRetreatDuration ?? 0.45;
+    }
+
+    const orbitAngle = obstacle.rotation * 2.5 +
+      obstacle.id * 2.399963229728653 + (obstacle.gnatOrbitPhase ?? 0);
+    let offsetX = Math.cos(orbitAngle) * 2.2 +
+      Math.sin(obstacle.rotation * 31 + (obstacle.gnatJitterPhaseX ?? obstacle.id ?? 0)) * 1.8 +
+      Math.sin(obstacle.rotation * 67 + (obstacle.gnatJitterPhaseY ?? 0)) * 0.7;
+    let offsetY = Math.sin(orbitAngle) * 2.2 +
+      Math.sin(obstacle.rotation * 37 + (obstacle.gnatJitterPhaseY ?? 0)) * 1.8 +
+      Math.sin(obstacle.rotation * 73 + (obstacle.gnatJitterPhaseX ?? obstacle.id ?? 0)) * 0.7;
+    const offsetLength = Math.hypot(offsetX, offsetY);
+    if (offsetLength > 4.2) {
+      offsetX *= 4.2 / offsetLength;
+      offsetY *= 4.2 / offsetLength;
+    }
+
     return {
       ...obstacle,
-      x: player.x + Math.cos(orbitAngle) * 2.5,
-      y: player.y + Math.sin(orbitAngle) * 2.5,
-      z: obstacle.z + (TUNNEL_SPEED + 2.5) * frameDelta,
+      gnatApproaching: approaching,
+      gnatModeTimer: modeTimer,
+      x: player.x + offsetX,
+      y: player.y + offsetY,
+      z: obstacle.z + (approaching ? TUNNEL_SPEED - 8 : TUNNEL_SPEED + 12) * frameDelta,
     };
   }
 

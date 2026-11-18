@@ -35,6 +35,15 @@ export function spawnObstacle(game) {
     radius: (1.2 + game.random() * 0.4) * archetype.size,
     driftX: (game.random() - 0.5) * 1.8,
     driftY: (game.random() - 0.5) * 1.8,
+    ...(archetype.type === "starGnat" ? {
+      gnatApproaching: game.random() < 0.5,
+      gnatModeTimer: 0.25 + game.random() * 0.65,
+      gnatApproachDuration: 0.35 + game.random() * 0.55,
+      gnatRetreatDuration: 0.3 + game.random() * 0.5,
+      gnatOrbitPhase: game.random() * Math.PI * 2,
+      gnatJitterPhaseX: game.random() * Math.PI * 2,
+      gnatJitterPhaseY: game.random() * Math.PI * 2,
+    } : {}),
     rotation: game.random() * Math.PI * 2,
   });
 }
