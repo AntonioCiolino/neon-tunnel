@@ -3,7 +3,8 @@ import TunnelCanvas from "./TunnelCanvas.jsx";
 import { useTunnelGame } from "../hooks/useTunnelGame.js";
 
 function GameSession({ onRestart }) {
-  const { canvasRef, hud, onShoot } = useTunnelGame();
+  const { canvasRef, shoot: onShoot, status, score, hits } = useTunnelGame();
+  const hud = { status, score, hits };
   const gameOver = hud.status !== "playing";
 
   return (

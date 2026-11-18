@@ -1,22 +1,14 @@
 export default function TunnelCanvas({ canvasRef, onShoot }) {
+  // useTunnelGame's shoot takes client coordinates and measures the canvas itself.
   const handlePointerDown = (event) => {
     if (event.button !== 0) return;
-
-    const rect = event.currentTarget.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return;
-
-    onShoot?.(
-      event.clientX - rect.left,
-      event.clientY - rect.top,
-      rect.width,
-      rect.height
-    );
+    onShoot?.(event.clientX, event.clientY);
   };
 
   return (
     <canvas
       ref={canvasRef}
-      className="block h-full min-h-[320px] w-full touch-none"
+      className="absolute inset-0 block h-full w-full touch-none"
       onPointerDown={handlePointerDown}
       aria-label="Tunnel shooter game"
     >
