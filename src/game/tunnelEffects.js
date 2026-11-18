@@ -43,12 +43,13 @@ export function splitObstacle(game, obstacle) {
   if (!obstacle.canSplit) return false;
 
   emitGameEvent(game, "split");
-  const offset = obstacle.radius * 0.75;
+  const offset = obstacle.radius * 1.5;
   for (const direction of [-1, 1]) {
     game.obstacles.push({
       ...obstacle,
       id: game.nextId++,
       x: obstacle.x + offset * direction,
+      driftX: direction * 2.5,
       radius: obstacle.radius * 0.5,
       size: obstacle.size * 0.5,
       canSplit: false,
