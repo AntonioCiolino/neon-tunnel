@@ -69,8 +69,11 @@ export function advanceProjectiles(game, delta) {
     if (target) {
       hitObstacles.add(target);
       hits.push(target);
+      game.ammo = Math.min(MAX_AMMO, game.ammo + 1);
     } else if (next.z <= game.player.z + PROJECTILE_RANGE) {
       remaining.push({ ...projectile, ...next });
+    } else {
+      game.ammo = Math.min(MAX_AMMO, game.ammo + 1);
     }
   }
 
