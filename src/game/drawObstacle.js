@@ -3,14 +3,15 @@ import {
   isObstacleCollision,
   projectTunnelPoint,
 } from "./tunnelGeometry";
-import { spaceInvaderEdges, spaceInvaderVertices } from "./spaceInvaderMesh";
+import { enemyMeshes } from "./enemyMeshes";
 
 const WARNING_DEPTH = 14;
 
 
 export function drawObstacle(ctx, obstacle, distance, width, height) {
   const obstacleRadius = obstacle.radius || 1;
-  const points = spaceInvaderVertices.map(([x, y, z]) =>
+  const mesh = enemyMeshes[obstacle.type] || enemyMeshes.invader;
+  const points = mesh.vertices.map(([x, y, z]) =>
     projectTunnelPoint({
       x: obstacle.x + x * obstacleRadius,
       y: obstacle.y + y * obstacleRadius,
@@ -30,7 +31,7 @@ export function drawObstacle(ctx, obstacle, distance, width, height) {
     ctx.shadowBlur = 8 + pulse * 18;
   }
   ctx.beginPath();
-  spaceInvaderEdges.forEach(([from, to]) => {
+  mesh.edges.forEach(([from, to]) => {
     const start = points[from];
     const end = points[to];
     if (!start || !end) return;

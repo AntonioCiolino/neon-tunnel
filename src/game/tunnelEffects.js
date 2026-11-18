@@ -1,10 +1,14 @@
 import { SPAWN_DEPTH, TUNNEL_RADIUS, getTunnelCenter } from "./tunnelGeometry";
+import { enemyMeshes } from "./enemyMeshes";
 
 export function spawnObstacle(game) {
+  const enemyTypes = Object.keys(enemyMeshes);
+  const type = enemyTypes[Math.floor(game.random() * enemyTypes.length)];
   const center = getTunnelCenter(game.distance + SPAWN_DEPTH);
   const angle = game.random() * Math.PI * 2;
   const offset = Math.sqrt(game.random()) * (TUNNEL_RADIUS - 1.6);
   game.obstacles.push({
+    type,
     id: game.nextId++,
     x: center.x + Math.cos(angle) * offset,
     y: center.y + Math.sin(angle) * offset,
