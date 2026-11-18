@@ -20,6 +20,33 @@ export function drawObstacle(ctx, obstacle, player, width, height) {
     isObstacleCollision(obstacle, player);
   const perspective = projectWorldPoint(obstacle, camera, width, height);
   if (!perspective) return;
+
+  if (obstacle.type === "reward") {
+    const size = Math.max(6, Math.min(28, perspective.scale * obstacleRadius * 0.65));
+    ctx.save();
+    ctx.shadowColor = "#55ffb0";
+    ctx.shadowBlur = 12;
+    ctx.fillStyle = "#064b3b";
+    ctx.strokeStyle = "#55ffb0";
+    ctx.lineWidth = Math.max(2, size * 0.12);
+    ctx.beginPath();
+    ctx.arc(perspective.x, perspective.y, size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "#e8fff4";
+    ctx.lineWidth = Math.max(2, size * 0.22);
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(perspective.x - size * 0.45, perspective.y);
+    ctx.lineTo(perspective.x + size * 0.45, perspective.y);
+    ctx.moveTo(perspective.x, perspective.y - size * 0.45);
+    ctx.lineTo(perspective.x, perspective.y + size * 0.45);
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
   const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 140);
 
   ctx.save();
