@@ -43,6 +43,25 @@ export function splitObstacle(game, obstacle) {
   if (!obstacle.canSplit) return false;
 
   emitGameEvent(game, "split");
+  if (obstacle.type === "starPod") {
+    const gnat = enemyTypes.find(({ type }) => type === "starGnat");
+    for (let i = 0; i < 6; i += 1) {
+      game.obstacles.push({
+        ...obstacle,
+        type: gnat.type,
+        skill: gnat.skill,
+        size: gnat.size,
+        speed: gnat.speed,
+        canSplit: false,
+        id: game.nextId++,
+        radius: obstacle.radius * 0.4,
+        rotation: obstacle.rotation + (i * Math.PI * 2) / 6,
+        lastShotLevel: undefined,
+      });
+    }
+    return true;
+  }
+
   const offset = obstacle.radius * 1.5;
   for (const direction of [-1, 1]) {
     game.obstacles.push({

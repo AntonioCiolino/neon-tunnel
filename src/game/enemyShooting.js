@@ -12,5 +12,7 @@ export function selectEnemyShooter(game) {
   );
 
   if (eligible.length === 0) return null;
-  return eligible[Math.floor(game.random() * eligible.length)];
+  const gnats = eligible.filter((obstacle) => obstacle.type === "starGnat");
+  const shooters = gnats.length > 0 ? gnats : eligible;
+  return shooters[Math.floor(game.random() * shooters.length)];
 }
