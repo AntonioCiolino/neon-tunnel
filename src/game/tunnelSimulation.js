@@ -14,6 +14,7 @@ import { updateObstacleMotion } from "./obstacleMotion";
 import { emitGameEvent, explode, spawnObstacle, splitObstacle } from "./tunnelEffects";
 import { advanceProjectiles, createProjectile, MAX_AMMO } from "./projectiles";
 import { advanceEnemyProjectiles, fireEnemyProjectile } from "./enemyProjectiles";
+import { getEnemyFireInterval, selectEnemyShooter } from "./enemyShooting";
 
 export {
   COLLISION_DEPTH,
@@ -107,13 +108,11 @@ export function updateTunnelSimulation(game, delta) {
   game.fragments = game.fragments.filter((fragment) => fragment.life > 0 && fragment.z > 0);
 
   game.enemyFireTimer += dt;
-  if (game.enemyFireTimer >= 1.2) {
-    game.enemyFireTimer -= 1.2;
-    if (game.obstacles.length > 0) {
-      const shooter = game.obstacles[
-        Math.floor(game.random() * game.obstacles.length)
-      ];
-      fireEnemyProjectile(game, shooter);
+  if (game.enemyFireTimer >= getEnemyFireInterval(game.level)) {
+    game.enemyFireTimer -= getEnemyFireInterval(game.level);
+    const shooter = selectEnemyShooter(game);
+    if (shooter && fireEnemyProjectile(game, shooter)) {
+      shooter.lastShotLevel = game.level;
     }
   }
   const enemyHits = advanceEnemyProjectiles(game, dt);
