@@ -10,6 +10,8 @@ export function spawnObstacle(game) {
     y: center.y + Math.sin(angle) * offset,
     z: SPAWN_DEPTH,
     radius: 1.2 + game.random() * 0.4,
+    driftX: (game.random() - 0.5) * 1.8,
+    driftY: (game.random() - 0.5) * 1.8,
     rotation: game.random() * Math.PI * 2,
   });
 }

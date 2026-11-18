@@ -10,8 +10,10 @@ export function updateObstacleMotion(obstacle, center, level, delta, travel, col
 
   return {
     ...obstacle,
-    x: distance > 0 ? obstacle.x + (dx / distance) * steeringStep : obstacle.x,
-    y: distance > 0 ? obstacle.y + (dy / distance) * steeringStep : obstacle.y,
-    z: Math.max(collisionDepth, obstacle.z - travel - (level / 5) * Math.min(delta, 0.1)),
+    x: (distance > 0 ? obstacle.x + (dx / distance) * steeringStep : obstacle.x) +
+      (obstacle.driftX || 0) * Math.min(delta, 0.1),
+    y: (distance > 0 ? obstacle.y + (dy / distance) * steeringStep : obstacle.y) +
+      (obstacle.driftY || 0) * Math.min(delta, 0.1),
+    z: Math.max(collisionDepth, obstacle.z - travel - (level / 3) * Math.min(delta, 0.1)),
   };
 }
