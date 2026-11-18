@@ -31,7 +31,7 @@ export function drawTunnel(ctx, game, width, height) {
   ctx.lineWidth = 1;
   for (let i = 0; i < rings.length; i += 1) {
     const ring = rings[i];
-    const alpha = Math.max(0.08, 0.62 - i * 0.035);
+    const alpha = Math.max(0.08, (i % 2 === 0 ? 0.62 : 0.3) - i * 0.025);
     ctx.strokeStyle = `rgba(40, 255, 166, ${alpha})`;
     ctx.beginPath();
 
@@ -41,6 +41,28 @@ export function drawTunnel(ctx, game, width, height) {
       ctx.moveTo(point.x, point.y);
       ctx.lineTo(next.x, next.y);
     });
+
+    ctx.stroke();
+  }
+
+  for (let side = 0; side < sides; side += 1) {
+    ctx.strokeStyle = side % 2 === 0
+      ? "rgba(40, 255, 166, 0.42)"
+      : "rgba(40, 255, 166, 0.2)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+
+    for (let i = 0; i < rings.length - 1; i += 1) {
+      const current = rings[i];
+      const next = rings[i + 1];
+      if (next.depth <= current.depth) continue;
+
+      const start = current.points[side];
+      const end = next.points[side];
+      if (!start || !end) continue;
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(end.x, end.y);
+    }
 
     ctx.stroke();
   }
