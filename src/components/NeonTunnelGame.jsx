@@ -5,6 +5,7 @@ import LevelAdvanceToast from "./LevelAdvanceToast.jsx";
 import DamageFlash from "./DamageFlash.jsx";
 import GameControls from "./GameControls.jsx";
 import AmmoHud from "./AmmoHud.jsx";
+import HealthHud from "./HealthHud.jsx";
 import { useTunnelGame } from "../hooks/useTunnelGame.js";
 import useGameEventSounds from "../hooks/useGameEventSounds.js";
 
@@ -16,6 +17,8 @@ function GameSession({ onRestart, onEvent }) {
     score,
     distance,
     hits,
+    health,
+    maxHealth,
     enemyHitCount,
     ammo,
     round,
@@ -24,7 +27,7 @@ function GameSession({ onRestart, onEvent }) {
     pause,
     resume,
   } = useTunnelGame(onEvent);
-  const hud = { status, score, distance, hits, ammo, round, level };
+  const hud = { status, score, distance, hits, health, maxHealth, ammo, round, level };
   const gameOver = hud.status !== "playing";
 
   const handleShoot = (x, y) => {
@@ -48,7 +51,7 @@ function GameSession({ onRestart, onEvent }) {
         </h1>
         <div className="flex gap-5 font-mono text-sm sm:gap-8 sm:text-base">
           <span> SCORE <strong className="text-white">{hud.score}</strong></span>
-          <span> HITS <strong className="text-rose-400">{hud.hits}/3</strong></span>
+          <HealthHud health={hud.health} maxHealth={hud.maxHealth} />
           <AmmoHud ammo={hud.ammo} />
           <GameControls
             paused={paused}
