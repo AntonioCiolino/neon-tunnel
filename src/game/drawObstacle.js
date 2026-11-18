@@ -1,24 +1,16 @@
 import {
-  COLLISION_DEPTH,
   getTunnelCenter,
   isObstacleCollision,
   projectTunnelPoint,
 } from "./tunnelGeometry";
+import { spaceInvaderEdges, spaceInvaderVertices } from "./spaceInvaderMesh";
 
 const WARNING_DEPTH = 14;
 
-const obstacleVertices = [
-  [1, 0, 0], [-1, 0, 0], [0, 1, 0],
-  [0, -1, 0], [0, 0, 1], [0, 0, -1],
-];
-const obstacleEdges = [
-  [0, 2], [0, 3], [0, 4], [0, 5], [1, 2], [1, 3],
-  [1, 4], [1, 5], [2, 4], [2, 5], [3, 4], [3, 5],
-];
 
 export function drawObstacle(ctx, obstacle, distance, width, height) {
   const obstacleRadius = obstacle.radius || 1;
-  const points = obstacleVertices.map(([x, y, z]) =>
+  const points = spaceInvaderVertices.map(([x, y, z]) =>
     projectTunnelPoint({
       x: obstacle.x + x * obstacleRadius,
       y: obstacle.y + y * obstacleRadius,
@@ -38,7 +30,7 @@ export function drawObstacle(ctx, obstacle, distance, width, height) {
     ctx.shadowBlur = 8 + pulse * 18;
   }
   ctx.beginPath();
-  obstacleEdges.forEach(([from, to]) => {
+  spaceInvaderEdges.forEach(([from, to]) => {
     const start = points[from];
     const end = points[to];
     if (!start || !end) return;
