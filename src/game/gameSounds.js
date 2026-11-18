@@ -1,5 +1,6 @@
 const SOUND_PATTERNS = {
   shoot: [[520, 0.07, 0, "square"]],
+  gnatFire: [[145, 0.08, 0, "sawtooth"], [155, 0.08, 0.07, "sawtooth"], [138, 0.12, 0.14, "sawtooth"], [165, 0.1, 0.25, "sawtooth"]],
   destroy: [[660, 0.08, 0, "triangle"], [990, 0.12, 0.06, "triangle"]],
   hit: [[150, 0.2, 0, "sawtooth"]],
   levelUp: [[523, 0.12, 0, "triangle"], [659, 0.12, 0.1, "triangle"], [784, 0.2, 0.2, "triangle"]],

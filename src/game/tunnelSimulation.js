@@ -113,6 +113,7 @@ export function updateTunnelSimulation(game, delta) {
     const shooter = selectEnemyShooter(game);
     if (shooter && fireEnemyProjectile(game, shooter)) {
       shooter.lastShotLevel = game.level;
+      if (shooter.type === "starGnat") emitGameEvent(game, "gnatFire");
     }
   }
   const enemyHits = advanceEnemyProjectiles(game, dt);
