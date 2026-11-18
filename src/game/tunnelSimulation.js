@@ -109,8 +109,10 @@ export function updateTunnelSimulation(game, delta) {
 // Screen coordinates and dimensions must use the same units, such as CSS pixels.
 // Returns the destroyed obstacle, or null when the shot misses.
 export function shootTunnelObstacle(game, x, y, width, height) {
-  if (game.status !== "playing" || !Number.isFinite(x) || !Number.isFinite(y)) return null;
+  if (game.status !== "playing" || !Number.isFinite(x) || !Number.isFinite(y) ||
+      game.score < 25) return null;
 
+  game.score -= 25;
   emitGameEvent(game, "shoot");
   let target = null;
   for (const obstacle of game.obstacles) {
