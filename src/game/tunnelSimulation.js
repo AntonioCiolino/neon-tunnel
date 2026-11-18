@@ -12,7 +12,7 @@ import {
   projectTunnelPoint,
 } from "./tunnelGeometry";
 import { updateObstacleMotion } from "./obstacleMotion";
-import { explode, spawnObstacle } from "./tunnelEffects";
+import { explode, spawnObstacle, splitObstacle } from "./tunnelEffects";
 
 export {
   COLLISION_DEPTH,
@@ -117,6 +117,7 @@ export function shootTunnelObstacle(game, x, y, width, height) {
   if (!target) return null;
   game.obstacles = game.obstacles.filter ( (obstacle) => obstacle !== target);
   game.score += Math.round((100 + target.z) / 10) * 10;
+  splitObstacle(game, target);
   explode(game, target);
   return target;
 }

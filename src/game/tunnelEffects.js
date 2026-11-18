@@ -1,23 +1,47 @@
 import { SPAWN_DEPTH, TUNNEL_RADIUS, getTunnelCenter } from "./tunnelGeometry";
-import { enemyMeshes } from "./enemyMeshes";
+import { enemyTypes, getEnemyComplexityLimit } from "./enemyTypes";
 
 export function spawnObstacle(game) {
-  const enemyTypes = Object.keys(enemyMeshes);
-  const type = enemyTypes[Math.floor(game.random() * enemyTypes.length)];
+  const eligibleTypes = enemyTypes.filter(
+    ({ skill }) => skill <= getEnemyComplexityLimit(game.level),
+  );
+  const archetype = eligibleTypes[Math.floor(game.random() * eligibleTypes.length)];
   const center = getTunnelCenter(game.distance + SPAWN_DEPTH);
   const angle = game.random() * Math.PI * 2;
   const offset = Math.sqrt(game.random()) * (TUNNEL_RADIUS - 1.6);
   game.obstacles.push({
-    type,
+    type: archetype.type,
+    skill: archetype.skill,
+    size: archetype.size,
+    speed: archetype.speed,
+    canSplit: Boolean(archetype.canSplit),
     id: game.nextId++,
     x: center.x + Math.cos(angle) * offset,
     y: center.y + Math.sin(angle) * offset,
     z: SPAWN_DEPTH,
-    radius: 1.2 + game.random() * 0.4,
+    radius: (1.2 + game.random() * 0.4) * archetype.size,
     driftX: (game.random() - 0.5) * 1.8,
     driftY: (game.random() - 0.5) * 1.8,
     rotation: game.random() * Math.PI * 2,
   });
+}
+
+export function splitObstacle(game, obstacle) {
+  if (!obstacle.canSplit) return false;
+
+  const offset = obstacle.radius * 0.75;
+  for (const direction of [-1, 1]) {
+    game.obstacles.push({
+      ...obstacle,
+      id: game.nextId++,
+      x: obstacle.x + offset * direction,
+      radius: obstacle.radius * 0.5,
+      size: obstacle.size * 0.5,
+      canSplit: false,
+      rotation: obstacle.rotation + Math.PI,
+    });
+  }
+  return true;
 }
 
 export function explode(game, obstacle) {
