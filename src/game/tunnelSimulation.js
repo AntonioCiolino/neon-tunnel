@@ -8,9 +8,8 @@ import {
   TUNNEL_RADIUS,
   TUNNEL_SPEED,
   getTunnelCenter,
-  isObstacleCollision,
-  projectTunnelPoint,
 } from "./tunnelGeometry";
+import { distance3D, projectWorldPoint } from "./world3d";
 import { updateObstacleMotion } from "./obstacleMotion";
 import { explode, spawnObstacle, splitObstacle } from "./tunnelEffects";
 
@@ -30,6 +29,7 @@ export function createTunnelSimulation(random = Math.random) {
   return {
     status: "playing",
     distance: 0,
+    player: { ...getTunnelCenter(0), z: 0 },
     round: 1,
     level: 1,
     score: 0,
@@ -51,6 +51,7 @@ export function updateTunnelSimulation(game, delta) {
   const dt = Math.min(delta, 0.1);
   const travel = TUNNEL_SPEED * dt;
   game.distance += travel;
+  game.player = { ...getTunnelCenter(game.distance), z: game.distance };
   game.round = Math.floor(game.distance / ROUND_DISTANCE) + 1;
   game.level = Math.floor((game.round - 1) / ROUNDS_PER_LEVEL) + 1;
   game.spawnTimer += dt;
@@ -60,20 +61,21 @@ export function updateTunnelSimulation(game, delta) {
       obstacle,
       updateObstacleMotion(
         obstacle,
-        getTunnelCenter(game.distance),
-        game.level + (SPAWN_DEPTH - obstacle.z) / SPAWN_DEPTH,
+        game.player,
+        game.level + (game.player.z + SPAWN_DEPTH - obstacle.z) / SPAWN_DEPTH,
         dt,
-        travel,
-        COLLISION_DEPTH,
       ),
     );
     obstacle.rotation += dt;
   }
 
-  const missed = game.obstacles.filter((obstacle) => obstacle.z <= COLLISION_DEPTH);
-  const player = getTunnelCenter(game.distance);
-  const impacts = missed.filter((obstacle) => isObstacleCollision(obstacle, player));
-  game.obstacles = game.obstacles.filter((obstacle) => obstacle.z > COLLISION_DEPTH);
+  const impacts = game.obstacles.filter(
+    (obstacle) => distance3D(obstacle, game.player) <= obstacle.radius + COLLISION_DEPTH,
+  );
+  game.obstacles = game.obstacles.filter(
+    (obstacle) => obstacle.z > game.player.z + COLLISION_DEPTH &&
+      !impacts.includes(obstacle),
+  );
   game.hits = Math.min(MAX_HITS, game.hits + impacts.length);
 
   for (const fragment of game.fragments) {
@@ -94,6 +96,7 @@ export function updateTunnelSimulation(game, delta) {
     game.spawnTimer -= SPAWN_INTERVAL;
     for (let i = 0; i < game.level; i += 1) {
       spawnObstacle(game);
+      game.obstacles[game.obstacles.length - 1].z += game.player.z;
     }
   }
 }
@@ -105,7 +108,7 @@ export function shootTunnelObstacle(game, x, y, width, height) {
 
   let target = null;
   for (const obstacle of game.obstacles) {
-    const projected = projectTunnelPoint(obstacle, game.distance, width, height);
+    const projected = projectWorldPoint(obstacle, game.player, width, height);
     if (!projected) continue;
     const radius = Math.max(12, obstacle.radius * projected.scale);
     if (Math.hypot(x - projected.x, y - projected.y) <= radius &&
