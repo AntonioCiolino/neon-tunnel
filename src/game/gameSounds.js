@@ -34,6 +34,7 @@ export function playGameSound(audioContext, event) {
   if (!eventType) return;
 
   const normalizedType = eventType.replace(/[-_\s]/g, "");
+  const volume = normalizedType === "shoot" || normalizedType === "shot" ? 0.042 : 0.12;
   const pattern = SOUND_PATTERNS[eventType] ||
     SOUND_PATTERNS[EVENT_ALIASES[normalizedType]] ||
     [[420, 0.1, 0, "sine"]];
@@ -46,7 +47,7 @@ export function playGameSound(audioContext, event) {
     oscillator.type = waveform;
     oscillator.frequency.setValueAtTime(frequency, start);
     gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(0.12, start + 0.01);
+    gain.gain.exponentialRampToValueAtTime(volume, start + 0.01);
     gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
     oscillator.connect(gain);
     gain.connect(audioContext.destination);
