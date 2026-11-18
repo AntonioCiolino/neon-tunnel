@@ -75,13 +75,14 @@ export function updateTunnelSimulation(game, delta) {
     obstacle.rotation += dt;
   }
 
-  for (const target of advanceProjectiles(game, dt)) {
+  const projectileHits = advanceProjectiles(game, dt);
+  for (const target of projectileHits) {
     game.score += Math.round((100 + target.z) / 10) * 10;
     splitObstacle(game, target);
     explode(game, target);
   }
-  const projectileHits = new Set(
-    game.events.length ? [] : [],
+  game.obstacles = game.obstacles.filter(
+    (obstacle) => !projectileHits.includes(obstacle),
   );
   const impacts = game.obstacles.filter(
     (obstacle) => distance3D(obstacle, game.player) <= obstacle.radius + COLLISION_DEPTH,
@@ -122,24 +123,11 @@ export function updateTunnelSimulation(game, delta) {
 export function shootTunnelObstacle(game, x, y, width, height) {
   if (game.status !== "playing" || !Number.isFinite(x) || !Number.isFinite(y)) return null;
 
+  const projectile = createProjectile(game, x, y, width, height);
+  if (!projectile) return null;
+
   game.score -= 25;
   emitGameEvent(game, "shoot");
-  let target = null;
-  for (const obstacle of game.obstacles) {
-    const projected = projectWorldPoint(obstacle, game.player, width, height);
-    if (!projected) continue;
-    const radius = Math.max(12, obstacle.radius * projected.scale);
-    if (Math.hypot(x - projected.x, y - projected.y) <= radius &&
-        (!target || obstacle.z < target.z)) {
-      target = obstacle;
-    }
-  }
-
-  if (!target) return null;
-  game.obstacles = game.obstacles.filter ( (obstacle) => obstacle !== target);
-  const sizeMultiplier = target.size < 1 ? 2 : 1;
-  game.score += Math.round((100 + target.z) / 10) * 10 * sizeMultiplier;
-  splitObstacle(game, target);
-  explode(game, target);
-  return target;
+  game.projectiles.push(projectile);
+  return projectile;
 }
