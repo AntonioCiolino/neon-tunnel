@@ -2,6 +2,7 @@ import { useState } from "react";
 import TunnelCanvas from "./TunnelCanvas.jsx";
 import ProgressionHud from "./ProgressionHud.jsx";
 import LevelAdvanceToast from "./LevelAdvanceToast.jsx";
+import DamageFlash from "./DamageFlash.jsx";
 import { useTunnelGame } from "../hooks/useTunnelGame.js";
 
 function GameSession({ onRestart }) {
@@ -23,6 +24,7 @@ function GameSession({ onRestart }) {
 
       <ProgressionHud round={hud.round} level={hud.level} distance={hud.distance} />
       <LevelAdvanceToast level={hud.level} />
+      <DamageFlash hits={hud.hits} />
       <TunnelCanvas canvasRef={canvasRef} onShoot={onShoot} />
 
       {gameOver && (
