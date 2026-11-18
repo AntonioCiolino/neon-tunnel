@@ -42,15 +42,6 @@ export function drawTunnel(ctx, game, width, height) {
       ctx.lineTo(next.x, next.y);
     });
 
-    if (i < rings.length - 1) {
-      const farther = rings[i + 1].points;
-      ring.points.forEach((point, side) => {
-        const next = farther[side];
-        if (!point || !next) return;
-        ctx.moveTo(point.x, point.y);
-        ctx.lineTo(next.x, next.y);
-      });
-    }
     ctx.stroke();
   }
 
