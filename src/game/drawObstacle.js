@@ -1,4 +1,9 @@
-import { projectTunnelPoint } from "./tunnelSimulation";
+import {
+  COLLISION_DEPTH,
+  getTunnelCenter,
+  isObstacleCollision,
+  projectTunnelPoint,
+} from "./tunnelSimulation";
 
 const WARNING_DEPTH = 14;
 
@@ -20,7 +25,9 @@ export function drawObstacle(ctx, obstacle, distance, width, height) {
       z: obstacle.z + z * obstacleRadius * 0.55,
     }, distance, width, height),
   );
-  const warning = obstacle.z <= WARNING_DEPTH;
+  const impactDistance = distance + Math.max(0, obstacle.z - COLLISION_DEPTH);
+  const warning = obstacle.z <= WARNING_DEPTH &&
+    isObstacleCollision(obstacle, getTunnelCenter(impactDistance));
   const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 140);
 
   ctx.save();

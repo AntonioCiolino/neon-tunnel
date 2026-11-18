@@ -6,7 +6,7 @@ const SPAWN_DEPTH = 65;
 const SPAWN_INTERVAL = 1.1;
 const ROUND_DISTANCE = 500;
 const ROUNDS_PER_LEVEL = 10;
-const COLLISION_DEPTH = 1.2;
+export const COLLISION_DEPTH = 1.2;
 
 // Distance is measured along the tunnel from its starting point.
 export function getTunnelCenter(distance) {
@@ -14,6 +14,10 @@ export function getTunnelCenter(distance) {
     x: Math.sin(distance * 0.035) * 3 + Math.sin(distance * 0.012) * 2,
     y: Math.sin(distance * 0.027) * 2.5,
   };
+}
+
+export function isObstacleCollision(obstacle, player) {
+  return Math.hypot(obstacle.x - player.x, obstacle.y - player.y) <= obstacle.radius;
 }
 
 // Points use world x/y and z as distance ahead of the camera.
@@ -96,9 +100,7 @@ export function updateTunnelSimulation(game, delta) {
 
   const missed = game.obstacles.filter((obstacle) => obstacle.z <= COLLISION_DEPTH);
   const player = getTunnelCenter(game.distance);
-  const impacts = missed.filter((obstacle) =>
-    Math.hypot(obstacle.x - player.x, obstacle.y - player.y) <= obstacle.radius
-  );
+  const impacts = missed.filter((obstacle) => isObstacleCollision(obstacle, player));
   game.obstacles = game.obstacles.filter((obstacle) => obstacle.z > COLLISION_DEPTH);
   game.hits = Math.min(MAX_HITS, game.hits + impacts.length);
 
