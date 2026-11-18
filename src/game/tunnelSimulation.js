@@ -15,6 +15,7 @@ import { emitGameEvent, explode, spawnObstacle, splitObstacle } from "./tunnelEf
 import { advanceProjectiles, createProjectile, MAX_AMMO } from "./projectiles";
 import { advanceEnemyProjectiles, fireEnemyProjectile } from "./enemyProjectiles";
 import { getEnemyFireInterval, selectEnemyShooter } from "./enemyShooting";
+import { applyHealthDamage, getImpactDamage, MAX_HEALTH } from "./healthSystem";
 
 export {
   COLLISION_DEPTH,
@@ -36,6 +37,8 @@ export function createTunnelSimulation(random = Math.random) {
     round: 1,
     level: 1,
     score: 0,
+    health: MAX_HEALTH,
+    maxHealth: MAX_HEALTH,
     hits: 0,
     obstacles: [],
     projectiles: [],
@@ -96,7 +99,10 @@ export function updateTunnelSimulation(game, delta) {
       !impacts.includes(obstacle),
   );
   game.hits = Math.min(MAX_HITS, game.hits + impacts.length);
-  impacts.forEach(() => emitGameEvent(game, "hit"));
+  impacts.forEach((obstacle) => {
+    applyHealthDamage(game, getImpactDamage(obstacle));
+    emitGameEvent(game, "hit");
+  });
 
   for (const fragment of game.fragments) {
     fragment.x += fragment.vx * dt;
@@ -120,7 +126,7 @@ export function updateTunnelSimulation(game, delta) {
   game.score -= enemyHits * 10;
   for (let i = 0; i < enemyHits; i += 1) emitGameEvent(game, "enemyHit");
 
-  if (game.hits >= MAX_HITS) {
+  if (game.health <= 0) {
     game.status = "gameOver";
     emitGameEvent(game, "gameOver");
     return;

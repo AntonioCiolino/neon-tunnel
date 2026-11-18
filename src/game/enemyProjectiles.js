@@ -1,4 +1,5 @@
 import { COLLISION_DEPTH } from "./tunnelGeometry";
+import { applyHealthDamage, ENEMY_PROJECTILE_DAMAGE } from "./healthSystem";
 
 const ENEMY_PROJECTILE_SPEED = 36;
 const ENEMY_PROJECTILE_RADIUS = 0.4;
@@ -74,6 +75,7 @@ export function advanceEnemyProjectiles(game, delta) {
     if (distanceToSegment(game.player, projectile, next) <=
         projectile.radius + COLLISION_DEPTH) {
       hits += 1;
+      applyHealthDamage(game, ENEMY_PROJECTILE_DAMAGE);
     } else if (next.z >= game.player.z - projectile.radius) {
       remaining.push({ ...projectile, ...next });
     }
