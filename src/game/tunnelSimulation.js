@@ -101,7 +101,7 @@ export function updateTunnelSimulation(game, delta) {
       updateObstacleMotion(
         obstacle,
         getTunnelCenter(game.distance),
-        game.level,
+        game.level + (SPAWN_DEPTH - obstacle.z) / SPAWN_DEPTH,
         dt,
         COLLISION_DEPTH,
       ),
