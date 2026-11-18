@@ -10,17 +10,33 @@ export function fireEnemyProjectile(game, obstacle) {
   const distance = Math.hypot(dx, dy, dz);
   if (distance <= 0) return null;
 
-  const projectile = {
-    x: obstacle.x,
-    y: obstacle.y,
-    z: obstacle.z,
-    vx: (dx / distance) * ENEMY_PROJECTILE_SPEED,
-    vy: (dy / distance) * ENEMY_PROJECTILE_SPEED,
-    vz: (dz / distance) * ENEMY_PROJECTILE_SPEED,
-    radius: ENEMY_PROJECTILE_RADIUS,
-  };
-  game.enemyProjectiles.push(projectile);
-  return projectile;
+  const projectileCount = obstacle.type === "drone" ? 45 : 1;
+  const spread = Math.PI / 3;
+  let firstProjectile = null;
+
+  for (let i = 0; i < projectileCount; i += 1) {
+    const angle = projectileCount > 1
+      ? ((i / (projectileCount - 1)) - 0.5) * spread
+      : 0;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    const spreadDx = dx * cos - dy * sin;
+    const spreadDy = dx * sin + dy * cos;
+    const spreadDistance = Math.hypot(spreadDx, spreadDy, dz);
+    const projectile = {
+      x: obstacle.x,
+      y: obstacle.y,
+      z: obstacle.z,
+      vx: (spreadDx / spreadDistance) * ENEMY_PROJECTILE_SPEED,
+      vy: (spreadDy / spreadDistance) * ENEMY_PROJECTILE_SPEED,
+      vz: (dz / spreadDistance) * ENEMY_PROJECTILE_SPEED,
+      radius: ENEMY_PROJECTILE_RADIUS,
+    };
+    game.enemyProjectiles.push(projectile);
+    if (i === 0) firstProjectile = projectile;
+  }
+
+  return firstProjectile;
 }
 
 function distanceToSegment(point, start, end) {
