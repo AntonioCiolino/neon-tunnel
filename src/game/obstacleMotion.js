@@ -1,8 +1,8 @@
 export function updateObstacleMotion(obstacle, player, level, delta) {
   if (!Number.isFinite(delta) || delta <= 0) return obstacle;
 
-  const speed = (1.2 + Math.max(0, level - 1) * 0.35) *
-    (obstacle.speed || 1) / Math.max(obstacle.size || 1, 0.1);
+  const speed = (0.5 + Math.max(0, level - 1) * 0.35) *
+    (obstacle.speed || 1);
   const step = speed * Math.min(delta, 0.1);
   const dx = player.x - obstacle.x;
   const dy = player.y - obstacle.y;
