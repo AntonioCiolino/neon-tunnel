@@ -8,6 +8,8 @@ const ROUND_DISTANCE = 500;
 const ROUNDS_PER_LEVEL = 10;
 export const COLLISION_DEPTH = 1.2;
 
+import { updateObstacleMotion } from "./obstacleMotion";
+
 // Distance is measured along the tunnel from its starting point.
 export function getTunnelCenter(distance) {
   return {
@@ -94,7 +96,17 @@ export function updateTunnelSimulation(game, delta) {
   game.spawnTimer += dt;
 
   for (const obstacle of game.obstacles) {
-    obstacle.z -= travel;
+    const impactDistance = game.distance + Math.max(0, obstacle.z - COLLISION_DEPTH);
+    Object.assign(
+      obstacle,
+      updateObstacleMotion(
+        obstacle,
+        getTunnelCenter(impactDistance),
+        game.level,
+        dt,
+        COLLISION_DEPTH,
+      ),
+    );
     obstacle.rotation += dt;
   }
 
