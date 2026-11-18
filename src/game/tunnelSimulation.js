@@ -96,12 +96,11 @@ export function updateTunnelSimulation(game, delta) {
   game.spawnTimer += dt;
 
   for (const obstacle of game.obstacles) {
-    const impactDistance = game.distance + Math.max(0, obstacle.z - COLLISION_DEPTH);
     Object.assign(
       obstacle,
       updateObstacleMotion(
         obstacle,
-        getTunnelCenter(impactDistance),
+        getTunnelCenter(game.distance),
         game.level,
         dt,
         COLLISION_DEPTH,
