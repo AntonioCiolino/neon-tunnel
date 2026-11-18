@@ -16,6 +16,10 @@ Later requests added sound, health, ammo, enemy types, levels and tuning.
 
 The history is the build log. The first commit is the blank app Voice Developer starts from, and each commit after it is one task, named `Task i/n: <what it did> [files: ...]`, in the order it ran. One commit, `Fix the white screen after Start`, was made by hand: the first version left a component guessing what a hook returned, which is how Voice Developer learned to show each task the files earlier tasks wrote (its last line refers to files from the app this one replaced, which are not in this repo). The final commit adds this README and the GitHub Pages deploy.
 
+## No tests (yet), on purpose
+
+There are no tests. Voice Developer builds apps for fun and checks each step only with a build and a lint, which catch an app that fails to load but not wrong game rules. If this game is worth hardening, that happens here, in this repo, like any other codebase: pull it into a coding agent and write tests for the rules in `src/game/` (none of them touch the DOM, so they run in plain Node, for example with Vitest), then add them to CI. The game would no longer be built purely by voice from that point, and the history would show it.
+
 ## Run it locally
 
 ```
