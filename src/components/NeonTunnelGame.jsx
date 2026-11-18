@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TunnelCanvas from "./TunnelCanvas.jsx";
 import ProgressionHud from "./ProgressionHud.jsx";
 import LevelAdvanceToast from "./LevelAdvanceToast.jsx";
 import DamageFlash from "./DamageFlash.jsx";
 import GameControls from "./GameControls.jsx";
 import { useTunnelGame } from "../hooks/useTunnelGame.js";
+import useGameSounds from "../hooks/useGameSounds.js";
 
-function GameSession({ onRestart }) {
+function GameSession({ onRestart, sounds }) {
   const {
     canvasRef,
     shoot: onShoot,
@@ -22,6 +23,29 @@ function GameSession({ onRestart }) {
   } = useTunnelGame();
   const hud = { status, score, distance, hits, round, level };
   const gameOver = hud.status !== "playing";
+  const previousState = useRef({ hits, level, status });
+
+  useEffect(() => {
+    const previous = previousState.current;
+    if (hits > previous.hits) sounds.playHit();
+    if (level > previous.level) sounds.playLevelUp();
+    if (previous.status === "playing" && status !== "playing") sounds.playGameOver();
+    previousState.current = { hits, level, status };
+  }, [hits, level, status, sounds]);
+
+  const handleShoot = (x, y) => {
+    sounds.playShoot();
+    onShoot(x, y);
+  };
+  const handleTogglePause = () => {
+    if (paused) {
+      sounds.playResume();
+      resume();
+    } else {
+      sounds.playPause();
+      pause();
+    }
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#020807] text-emerald-300">
@@ -34,7 +58,7 @@ function GameSession({ onRestart }) {
           <span> HITS <strong className="text-rose-400">{hud.hits}/3</strong></span>
           <GameControls
             paused={paused}
-            onToggle={() => (paused ? resume() : pause())}
+            onToggle={handleTogglePause}
           />
         </div>
       </header>
@@ -42,7 +66,7 @@ function GameSession({ onRestart }) {
       <ProgressionHud round={hud.round} level={hud.level} distance={hud.distance} />
       <LevelAdvanceToast level={hud.level} />
       <DamageFlash hits={hud.hits} />
-      <TunnelCanvas canvasRef={canvasRef} onShoot={onShoot} />
+      <TunnelCanvas canvasRef={canvasRef} onShoot={handleShoot} />
 
       {gameOver && (
         <div className="absolute inset-0 z-20 grid place-items-center bg-black/75 p-6 text-center">
@@ -64,11 +88,12 @@ function GameSession({ onRestart }) {
 }
 
 export default function NeonTunnelGame() {
+  const sounds = useGameSounds();
   const [started, setStarted] = useState(false);
   const [run, setRun] = useState(0);
 
   if (started) {
-    return <GameSession key={run} onRestart={() => setRun((value) => value + 1)} />;
+    return <GameSession key={run} sounds={sounds} onRestart={() => setRun((value) => value + 1)} />;
   }
 
   return (
@@ -82,7 +107,10 @@ export default function NeonTunnelGame() {
           Blast the incoming shapes. Three impacts end your run.
         </p>
         <button
-          onClick={() => setStarted(true)}
+          onClick={() => {
+            sounds.playStart();
+            setStarted(true);
+          }}
           className="border border-emerald-400 bg-emerald-400 px-8 py-4 font-bold uppercase tracking-[0.2em] text-black hover:bg-emerald-300"
         >
           Start game
