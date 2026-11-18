@@ -14,14 +14,15 @@ export function updateObstacleMotion(obstacle, player, level, delta) {
         : obstacle.gnatRetreatDuration ?? 0.45;
     }
 
-    const orbitAngle = obstacle.rotation * 2.5 +
+    const motionTime = obstacle.rotation / 10;
+    const orbitAngle = motionTime * 2.5 +
       obstacle.id * 2.399963229728653 + (obstacle.gnatOrbitPhase ?? 0);
     let offsetX = Math.cos(orbitAngle) * 2.2 +
-      Math.sin(obstacle.rotation * 31 + (obstacle.gnatJitterPhaseX ?? obstacle.id ?? 0)) * 1.8 +
-      Math.sin(obstacle.rotation * 67 + (obstacle.gnatJitterPhaseY ?? 0)) * 0.7;
+      Math.sin(motionTime * 31 + (obstacle.gnatJitterPhaseX ?? obstacle.id ?? 0)) * 1.8 +
+      Math.sin(motionTime * 67 + (obstacle.gnatJitterPhaseY ?? 0)) * 0.7;
     let offsetY = Math.sin(orbitAngle) * 2.2 +
-      Math.sin(obstacle.rotation * 37 + (obstacle.gnatJitterPhaseY ?? 0)) * 1.8 +
-      Math.sin(obstacle.rotation * 73 + (obstacle.gnatJitterPhaseX ?? obstacle.id ?? 0)) * 0.7;
+      Math.sin(motionTime * 37 + (obstacle.gnatJitterPhaseY ?? 0)) * 1.8 +
+      Math.sin(motionTime * 73 + (obstacle.gnatJitterPhaseX ?? obstacle.id ?? 0)) * 0.7;
     const offsetLength = Math.hypot(offsetX, offsetY);
     if (offsetLength > 4.2) {
       offsetX *= 4.2 / offsetLength;
@@ -34,7 +35,7 @@ export function updateObstacleMotion(obstacle, player, level, delta) {
       gnatModeTimer: modeTimer,
       x: player.x + offsetX,
       y: player.y + offsetY,
-      z: obstacle.z + (approaching ? TUNNEL_SPEED - 8 : TUNNEL_SPEED + 12) * frameDelta,
+      z: obstacle.z + (approaching ? TUNNEL_SPEED - 0.8 : TUNNEL_SPEED + 1.2) * frameDelta,
     };
   }
 
