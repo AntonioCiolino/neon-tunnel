@@ -3,7 +3,7 @@ import {
   getTunnelCenter,
   isObstacleCollision,
   projectTunnelPoint,
-} from "./tunnelSimulation";
+} from "./tunnelGeometry";
 
 const WARNING_DEPTH = 14;
 

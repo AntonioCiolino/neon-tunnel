@@ -1,4 +1,4 @@
-import { getTunnelCenter, projectTunnelPoint } from "./tunnelSimulation";
+import { getTunnelCenter, projectTunnelPoint } from "./tunnelGeometry";
 import { drawObstacle } from "./drawObstacle";
 
 export function drawTunnel(ctx, game, width, height) {
