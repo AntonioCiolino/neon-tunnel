@@ -39,7 +39,7 @@ export function updateObstacleMotion(obstacle, player, level, delta) {
     };
   }
 
-  const speed = (0.5 + Math.max(0, level - 1) * 0.35) / 5 *
+  const speed = (0.5 + Math.max(0, level - 1) * 0.35) / 10 *
     (obstacle.speed || 1);
   const step = speed * Math.min(delta, 0.1);
   const dx = player.x - obstacle.x;
