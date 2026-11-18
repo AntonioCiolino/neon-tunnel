@@ -13,7 +13,7 @@ export function drawTunnel(ctx, game, width, height) {
   const rings = [];
 
   for (let i = 0; i < ringCount; i += 1) {
-    const depth = 18 * Math.pow(1.34, i);
+    const depth = 10 * Math.pow(1.42, i);
     const center = getTunnelCenter(game.distance + depth);
     const ring = [];
 
