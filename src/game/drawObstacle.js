@@ -1,26 +1,25 @@
-import {
-  getTunnelCenter,
-  isObstacleCollision,
-  projectTunnelPoint,
-} from "./tunnelGeometry";
+import { isObstacleCollision } from "./tunnelGeometry";
+import { createCamera, projectWorldPoint } from "./world3d";
 import { enemyMeshes } from "./enemyMeshes";
 
 const WARNING_DEPTH = 14;
 
 
-export function drawObstacle(ctx, obstacle, distance, width, height) {
+export function drawObstacle(ctx, obstacle, player, width, height) {
   const obstacleRadius = obstacle.radius || 1;
   const mesh = enemyMeshes[obstacle.type] || enemyMeshes.invader;
+  const camera = createCamera(player);
   const points = mesh.vertices.map(([x, y, z]) =>
-    projectTunnelPoint({
+    projectWorldPoint({
       x: obstacle.x + x * obstacleRadius,
       y: obstacle.y + y * obstacleRadius,
       z: obstacle.z + z * obstacleRadius * 0.55,
-    }, distance, width, height),
+    }, camera, width, height),
   );
-  const warning = obstacle.z <= WARNING_DEPTH &&
-    isObstacleCollision(obstacle, getTunnelCenter(distance));
-  const perspective = projectTunnelPoint(obstacle, distance, width, height);
+  const warning = obstacle.z - player.z <= WARNING_DEPTH &&
+    isObstacleCollision(obstacle, player);
+  const perspective = projectWorldPoint(obstacle, camera, width, height);
+  if (!perspective) return;
   const pulse = 0.5 + 0.5 * Math.sin(performance.now() / 140);
 
   ctx.save();
