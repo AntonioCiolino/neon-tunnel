@@ -1,4 +1,5 @@
 import { getTunnelCenter, projectTunnelPoint } from "./tunnelSimulation";
+import { drawObstacle } from "./drawObstacle";
 
 export function drawTunnel(ctx, game, width, height) {
   if (!ctx || !game || width <= 0 || height <= 0) return;
@@ -67,36 +68,8 @@ export function drawTunnel(ctx, game, width, height) {
     ctx.stroke();
   }
 
-  const obstacleVertices = [
-    [1, 0, 0], [-1, 0, 0], [0, 1, 0],
-    [0, -1, 0], [0, 0, 1], [0, 0, -1],
-  ];
-  const obstacleEdges = [
-    [0, 2], [0, 3], [0, 4], [0, 5], [1, 2], [1, 3],
-    [1, 4], [1, 5], [2, 4], [2, 5], [3, 4], [3, 5],
-  ];
-
   for (const obstacle of game.obstacles) {
-    const obstacleRadius = obstacle.radius || 1;
-    const points = obstacleVertices.map(([x, y, z]) =>
-      projectTunnelPoint({
-        x: obstacle.x + x * obstacleRadius,
-        y: obstacle.y + y * obstacleRadius,
-        z: obstacle.z + z * obstacleRadius * 0.55,
-      }, game.distance, width, height),
-    );
-
-    ctx.strokeStyle = "#b8ff45";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    obstacleEdges.forEach(([from, to]) => {
-      const start = points[from];
-      const end = points[to];
-      if (!start || !end) return;
-      ctx.moveTo(start.x, start.y);
-      ctx.lineTo(end.x, end.y);
-    });
-    ctx.stroke();
+    drawObstacle(ctx, obstacle, game.distance, width, height);
   }
 
   for (const fragment of game.fragments) {
