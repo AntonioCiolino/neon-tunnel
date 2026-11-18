@@ -4,6 +4,8 @@ export const MAX_HITS = 3;
 
 const SPAWN_DEPTH = 65;
 const SPAWN_INTERVAL = 1.1;
+const ROUND_DISTANCE = 500;
+const ROUNDS_PER_LEVEL = 10;
 const COLLISION_DEPTH = 1.2;
 
 // Distance is measured along the tunnel from its starting point.
@@ -31,6 +33,8 @@ export function createTunnelSimulation(random = Math.random) {
   return {
     status: "playing",
     distance: 0,
+    round: 1,
+    level: 1,
     score: 0,
     hits: 0,
     obstacles: [],
@@ -81,6 +85,8 @@ export function updateTunnelSimulation(game, delta) {
   const dt = Math.min(delta, 0.1);
   const travel = TUNNEL_SPEED * dt;
   game.distance += travel;
+  game.round = Math.floor(game.distance / ROUND_DISTANCE) + 1;
+  game.level = Math.floor((game.round - 1) / ROUNDS_PER_LEVEL) + 1;
   game.spawnTimer += dt;
 
   for (const obstacle of game.obstacles) {
@@ -108,7 +114,9 @@ export function updateTunnelSimulation(game, delta) {
 
   while (game.spawnTimer >= SPAWN_INTERVAL) {
     game.spawnTimer -= SPAWN_INTERVAL;
-    spawnObstacle(game);
+    for (let i = 0; i < game.level; i += 1) {
+      spawnObstacle(game);
+    }
   }
 }
 
