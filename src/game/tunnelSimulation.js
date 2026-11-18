@@ -52,13 +52,13 @@ export function createTunnelSimulation(random = Math.random) {
 function spawnObstacle(game) {
   const center = getTunnelCenter(game.distance + SPAWN_DEPTH);
   const angle = game.random() * Math.PI * 2;
-  const offset = Math.sqrt(game.random()) * (TUNNEL_RADIUS - 1.2);
+  const offset = Math.sqrt(game.random()) * (TUNNEL_RADIUS - 1.6);
   game.obstacles.push({
     id: game.nextId++,
     x: center.x + Math.cos(angle) * offset,
     y: center.y + Math.sin(angle) * offset,
     z: SPAWN_DEPTH,
-    radius: 0.7 + game.random() * 0.3,
+    radius: 1.2 + game.random() * 0.4,
     rotation: game.random() * Math.PI * 2,
   });
 }
